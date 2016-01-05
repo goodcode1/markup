@@ -1,0 +1,20 @@
+{{#items}}
+.icon-{{name}}-before:before
+.icon-{{name}}-after:after
+	content ''
+
+.icon-{{name}}-before:before
+.icon-{{name}}-after:after
+.icon-{{name}}-inner
+	vertical-align middle
+
+	display inline-block
+	width {{px.width}}
+	height {{px.height}}
+
+	background url({{{escaped_image}}}) no-repeat {{px.offset_x}} {{px.offset_y}}
+
+.transition-icon-item.icon-{{name}}-inner
+	margin-left -({{px.width}} / 2)
+	margin-top -({{px.height}} / 2)
+{{/items}}

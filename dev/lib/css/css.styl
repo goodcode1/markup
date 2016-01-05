@@ -1,0 +1,180 @@
+//Icons
+icon(w, h, bpX, bpY, sprite = 'sprite.png')
+	&-icon-inner
+	&-icon-before:before
+	&-icon-after:after
+		vertical-align middle
+
+		display inline-block
+		width w
+		height h
+
+		background url($imagesDir/sprite) no-repeat bpX bpY
+
+	&-icon-before:before
+	&-icon-after:after
+		content ''
+
+.icon-text
+	vertical-align middle
+
+	display inline-block
+
+.transition-icons
+	position relative
+
+	.transition-icon-item
+		position absolute
+		left 50%
+		top 50%
+
+		transition opacity .3s ease-in
+	
+		&--over
+			opacity 0
+
+		&--out
+			opacity 1
+
+	&:hover
+		.transition-icon-item
+			&--over
+				opacity 1
+
+			&--out
+				opacity 0
+
+a
+button
+	&:hover
+		.transition-icons
+			.transition-icon-item
+				&--over
+					opacity 1
+
+				&--out
+					opacity 0
+
+
+//Custom btn
+btn(color)
+	&
+		background linear-gradient(135deg, transparent 10px, color 0) top left, linear-gradient(225deg, transparent 10px, color 0) top right, linear-gradient(315deg, transparent 10px, color 0) bottom right, linear-gradient(45deg, transparent 10px, color 0) bottom left
+		background-image radial-gradient(circle at 0 0, rgba(204,0,0,0) 7px, color 7px), radial-gradient(circle at 100% 0, rgba(204,0,0,0) 7px, color 7px), radial-gradient(circle at 100% 100%, rgba(204,0,0,0) 7px, color 7px), radial-gradient(circle at 0 100%, rgba(204,0,0,0) 7px, color 7px)
+
+		background-repeat no-repeat
+		background-size 50% 50%
+////Custom btn
+
+
+
+//Forms reset
+form-reset()
+	button
+	input
+	select
+	textarea
+		margin 0
+
+		padding 0
+
+		border none
+		outline none
+		background none
+		box-shadow none
+
+	button
+	select
+		cursor pointer
+
+	input[type=checkbox]
+		cursor pointer
+
+	input[type=radio]
+		cursor pointer
+////Forms reset
+
+
+
+//Font settings
+setFont(family = $defaultFontFamily, style = normal, weight = normal, size = 15px, lineHeight = 1.2, color = inherit)
+	font normal normal size/lineHeight family
+	color color
+////Font settings
+
+
+
+//Ful size image
+imgResize()
+	margin 0 auto
+
+	display block
+	width auto
+	max-width 100%
+	height auto
+//Full size image
+
+
+
+//Justify alignment
+.justify-alignment
+	text-align justify
+	
+	&:before
+		content ''
+
+		margin-bottom -1.2em
+
+		display block
+		width 100%
+	&:after
+		content ''
+
+		display inline-block
+		width 100%
+
+.justify-item
+	position relative
+	top 1.2em
+	vertical-align top
+
+	display inline-block
+
+	&--bottom
+		vertical-align bottom
+
+	&--top
+		vertical-align top
+
+	&--middle
+		vertical-align middle
+////Justify alignment
+
+
+
+//Hide text
+hide-text()
+	color transparent
+	text-indent -9999px
+////Hide text
+
+.columns
+	clearfix()
+
+	&--relative
+		position relative
+
+	.column-item
+		&--left
+			float left
+
+		&--right
+			float right
+
+		for w in (1..100)
+			&--w{w}
+				width w + '%'
+				
+		for m in (1..100)
+			&--m{m}
+				margin-right m + '%'

@@ -1,0 +1,77 @@
+{
+	"info": {
+		"name": "Шаблон",
+		"code": "template",
+		"year": "2015",
+		"notes": "Верстка шаблонного проекта",
+		"productionUrl": "http://wemakesites.ru/projects/template/",
+
+		"siteName": "Верстка",
+		"title": "Верстка шаблонного проекта",
+		"description": "Базовый шаблон для верстки",
+		"keywords": "html, css, js",
+		"image": "/i/og.jpg"
+	},
+	"ftp": {
+		"host": "wemakesites.ru",
+		"login": "wemakesites",
+		"password": "wemakesites-root"
+	},
+	"paths": {
+		"dev": {
+			"root": "./dev/",
+			"pages": "./dev/pages/",
+			"dummy": "./dev/dummy/",
+			"templates": "./dev/templates/",
+			"lib": "./dev/lib",
+			"js": "./dev/js/",
+			"images": "./dev/i/",
+			"icons": "./dev/i/icons/",
+			"css": "./dev/css/",
+			"cssLib": "./dev/lib/css/",
+			"htmlLib": "./dev/lib/html/",
+			"jsLib": "./dev/lib/js/",
+			"fonts": "./dev/public/fonts",
+			"docs": "./dev/docs/"
+		},
+		"prod": {
+			"root": "./prod/",
+			"archives": "./prod/archives/",
+			"dummy": "./prod/dummy/",
+			"fonts": "./prod/fonts",
+			"images": "./prod/i/",
+			"css": "./prod/css/",
+			"js": "./prod/js/",
+			"pages": "./prod/pages/"
+		}
+	},
+	"pages": {
+		"home": {
+			"name": "Главная",
+			"progress": "24",
+			"title": "Главная страница",
+			"breadCrumbs": [
+				{
+					"name": "Главная",
+					"href": "/"
+				}, {
+					"name": "Test"
+				}, {
+					"name": "Test2"
+				}
+			]
+		},
+		"catalog": {
+			"name": "Каталог",
+			"progress": "20"
+		},
+		"card": {
+			"name": "Карточка товара",
+			"progress": "30"
+		},
+		"contacts": {
+			"name": "Контакты",
+			"progress": "55"
+		}
+	}
+}

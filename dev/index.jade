@@ -1,0 +1,192 @@
+doctype html
+html(lang="ru")
+	head
+		meta(charset="UTF-8")
+		meta(http-equiv="X-UA-Compatible", content="IE=edge")
+		meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+		title Верстка проекта #{info.name} | HTML Atlantis
+		link(
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css", 
+			integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7",
+			rel="stylesheet",
+			crossorigin="anonymous"
+		)
+		link(
+			href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/lumen/bootstrap.min.css",
+			rel="stylesheet"
+		)
+		link(
+			href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css",
+			rel="stylesheet"
+		)
+	body
+		div.container
+			header
+				br
+				div(class="jumbotron")
+					div(class="row")
+						div(class="col-md-8")
+							div(class="text-muted")
+								small HTML-верстка проекта
+							
+							if info.name
+								h1(style="margin: 0;") #{info.name}
+
+							if info.notes
+								p(class="lead text-muted", style="line-height: 1")
+									small #{info.notes}
+
+						div(class="col-md-4")
+							if(archives && archives.length)
+								div(class="panel panel-default")
+									div(class="panel-heading") 
+										b Архивы верстки
+									div(class="panel-body")
+										ul(class="list-unstyled")
+											each archive, i in archives
+												li
+													if i == 0
+														b
+															i(class="fa fa-download")
+															| &nbsp;
+															a(href="#{archive.url}", class="link", title="Скачать")
+																| #{archive.date}
+															| &nbsp;
+															small(class="text-muted") (#{archive.size} Мб.)
+													else
+														i(class="fa fa-download")
+														| &nbsp;
+														a(href="#{archive.url}", class="link", title="Скачать")
+															| #{archive.date}
+														| &nbsp;
+														small(class="text-muted") (#{archive.size} Мб.)
+			// Расчет прогресса
+			if pages
+				- var progress = 0, progressCount = 0;
+				each page in pages
+					if page.progress
+						- progress += Number(page.progress);
+						- progressCount++;
+
+				- progress = Number(progress / progressCount);
+
+				if progress < 20
+					- lineClass = "default";
+				else if progress < 50
+					- lineClass = "warning";
+				else if progress < 80
+					- lineClass = "primary";
+				else if progress < 90
+					- lineClass = "primary";
+				else if progress < 100
+					- lineClass = "success";
+				else if progress == 100
+					- lineClass = "success";
+				h3 
+					| Общий прогресс 
+					span(class="label label-#{lineClass}") #{progress}%
+
+				div.progress
+					div(class="progress-bar progress-bar-#{lineClass}", role="progressbar", aria-valuenow="#{progress}", aria-valuemin="0", aria-valuemax="100", style="width: #{progress}%")
+			
+			br
+			h3 Сверстанные страницы
+			table(class="table table-striped")
+				thead
+					tr
+						th #
+						th Страница
+						th Готовность, %
+				if pages
+					tbody
+					- var i = 0;
+					each page, code in pages
+						- var pageProgress = Number(page.progress);
+						- i++;
+						tr
+							td #{i}
+							td
+								a(href="pages/#{code}.html", target="_blank") #{page.name}
+								if page.note
+									br
+									small.text-muted #{page.note}
+							td
+								- var labelClass, labelTitle;
+								if pageProgress < 20
+									- labelClass = "label-default";
+									- labelTitle = "Структура страницы";
+								else if pageProgress < 50
+									- labelClass = "label-warning";
+									- labelTitle = "Чистый HTML-код страницы";
+								else if pageProgress < 80
+									- labelClass = "label-primary";
+									- labelTitle = "В процессе стилизации и написания криптов";
+								else if pageProgress < 90
+									- labelClass = "label-primary";
+									- labelTitle = "Заверешние стилизации и написания скриптов";
+								else if pageProgress < 100
+									- labelClass = "label-success";
+									- labelTitle = "Тестирование и отладка";
+								else if pageProgress == 100
+									- labelClass = "label-success";
+									- labelTitle = "Страница готова";
+								span.label(class="#{labelClass}", data-toggle="tooltip", data-placement="top", title="#{labelTitle}") #{page.progress}
+			hr
+			footer
+				div(class="row")
+					div(class="col-md4 pull-left")
+						p(class="text-muted")
+							span(style="margin-left: -1em;") &copy; 
+							b HTML Atlantis
+							small , г. Ростов-на-Дону
+							if info.year
+								small , #{info.year} г.
+							br
+							span
+								i(class="fa fa-hand-pointer-o") &nbsp;
+								a(href="http://html-atlantis.ru", target="_blank", title="Перейти на наш сайт", data-toggle="tooltip", data-placement="top") html-atlantis.ru							
+							br
+							span
+								i(class="fa fa-envelope") &nbsp;
+								a(href="mailto:info@html-atlantis.ru", title="Написать нам на почту", data-toggle="tooltip", data-placement="top") info@html-atlantis.ru
+
+					div(class="col-md4 pull-right")
+						button(class="btn btn-primary", data-toggle="modal", data-target="#order-form") Заказать верстку
+						form(class="modal fade", id="order-form", tabindex="-1", role="dialog", aria-labelledby="myLargeModalLabel")
+							div(class="modal-dialog modal-lg")
+								div(class="modal-content")
+									div(class="modal-header")
+										button(type="button", class="close", data-dismiss="modal", aria-label="Close")
+											span(aria-hidden="true") &times;
+										h3(class="modal-title") Заказать HTML5-верстку
+									div(class="modal-body")
+										p Пожалуйста, заполните следующие поля и спустя короткое время мы с Вами свяжемся.
+										div(class="form-group")
+											label(for="order-name")
+												strong Ваше имя
+											input(type="text", class="form-control", id="order-name")
+										div(class="form-group")
+											label(for="order-email")
+												strong Ваша эл. почта
+											input(type="email", class="form-control", id="order-email")
+										div(class="form-group")
+											label(for="order-url")
+												strong Ссылка на макеты
+											input(type="text", class="form-control", id="order-url")
+										div(class="form-group")
+											label(for="order-comments")
+												strong Комментарии
+											textarea(class="form-control", rows="3", id="order-comments")
+									div(class="modal-footer")
+										button(type="submit", class="btn btn-primary") Отправить
+			
+			script(src="https://code.jquery.com/jquery-1.11.3.min.js")
+			script(
+				src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", 
+				integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS",
+				crossorigin="anonymous"
+			)
+			script.
+				(function($) {
+					$("[data-toggle=\"tooltip\"]").tooltip();
+				})(jQuery);

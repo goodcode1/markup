@@ -1,0 +1,75 @@
+include ../lib/html/html.jade
+doctype html
+<!--[if IE 7]><html lang="ru" prefix="og: http://ogp.me/ns#" class="ie8 no-js"><![endif]-->
+<!--[if IE 8]><html lang="ru" prefix="og: http://ogp.me/ns#" class="ie8 no-js"><![endif]-->
+<!--[if IE 9]><html lang="ru" prefix="og: http://ogp.me/ns#" class="ie9 no-js"><![endif]-->
+<!--[if !IE]><!-->
+html(lang="ru", class="no-js", prefix="og:http://ogp.me/ns#")
+	<!--<![endif]-->
+	head
+		+headerMeta({
+			charset: "utf-8",
+			keywords: info.keywords,
+			description: info.description,
+			title: info.title,
+			robots: "index, follow",
+			viewport: "width=device-width, initial-scale=1.0"
+		})
+		+openGraph({
+			type: "website",
+			siteName: info.siteName,
+			title: info.title,
+			description: info.description,
+			url: info.productionUrl,
+			image: info.image
+		})
+		+webIcons({
+			favicon: {
+				src: "/i/favicon.ico"
+			},
+			appleTouchIcon: [
+				{
+					src: "../i/icons/apple-touch-icon.jpg"
+				}, {
+					src: "../i/icons/apple-touch-icon-76.jpg",
+					size: "76x76"
+				}, {
+					src: "../i/icons/apple-touch-icon-140.jpg",	
+					size: "140x140"
+				}, {
+					src: "../i/icons/apple-touch-icon-152.jpg",
+					size: "152x152"
+				}
+			]
+		})
+		+addCSS([
+			{
+				media: "screen",
+				href: "../css/sprite.css",
+				noCache: true,
+			}, {
+				media: "screen",
+				href: "../css/" + info.code + ".css",
+				noCache: true
+			}
+		])
+
+	body(itemscope, itemtype="http://schema.org/WebPage")
+
+		div(class="page")
+			header(class="page-header", itemscope, itemtype="http://schema.org/WPHeader")
+
+
+			main(class="page-content")
+				block content
+
+		footer(class="page-footer", itemscope, itemtype="http://schema.org/WPFooter")
+
+
+		+addJS([
+			{
+				src: "http://code.jquery.com/jquery-1.11.3.min.js"
+			}, {
+				src: "../js/" + info.code + ".js"
+			}
+		])

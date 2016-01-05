@@ -1,0 +1,479 @@
+//- Header meta information 
+//- params = {
+//-	@charset (string) Page encoding
+//-	@title (string) Page title
+//-	@keywords (string) Page keywords
+//-	@description (sring) Page description
+//- }
+mixin headerMeta(params)
+	//Meta
+	if params.charset	
+		//- Charset
+		meta(charset="#{params.charset}")
+
+	if params.compatible
+		//- Compatible
+		meta(http-equiv="X-UA-Compatible", content="#{params.compatible}")
+
+	if params.viewport
+		//- Viewport
+		meta(name="viewport", content="#{params.viewport}")
+
+	if params.prefetch
+		//- DNS prefetching
+		each item in params.prefetch
+			link(rel="dns-prefetch", href="#{item}")
+
+	if params.title
+		//- Title
+		title !{params.title}
+
+	if params.keywords
+		//- Keywords
+		meta(name="keywords", content="#{params.keywords}")
+
+	if params.description
+		//- Description
+		meta(name="description", content="#{params.description}")
+
+	if params.robots
+		//- Robots
+		meta(name="robots", content="#{params.robots}")
+	////Meta
+
+
+
+//- Opengraph tags 
+//- documentation: http://ogp.me/
+//- params = {
+//-	@type (string)
+//-	@title (string) title on the snippet
+//- }
+mixin openGraph(params)
+	//Open graph
+	if params.type
+		meta(property="og:type", content="#{params.type}")
+		case params.type
+			when "website"
+				if params.title
+					meta(property="og:title", content="#{params.title}")
+				if params.siteName
+					meta(property="og:site_name", content="#{params.siteName}")
+				if params.description
+					meta(property="og:description", content="#{params.description}")
+				if params.url
+					meta(property="og:url", content="#{params.url}")
+				if params.image
+					meta(property="og:image", content="#{params.image}")
+	////Open graph
+
+
+
+//- Web icons for mobile devices and favicons for all browsers
+//- params = {
+//-	@favicon (object) favicon for all browsers
+//-	@appleTouchIcon (object) icon for apple devices
+//- }
+mixin webIcons(params)
+	//Icons
+	if params.favicon
+		link(href="#{params.favicon.src}", rel="shortcut icon", type="image/x-icon")
+		link(href="#{params.favicon.src}", rel="icon", type="image/x-icon")
+	if params.appleTouchIcon
+		each icon in params.appleTouchIcon
+			if icon.size
+				link(href="#{icon.src}", rel="apple-touch-icon", sizes="#{icon.size}")
+			else
+				link(href="#{icon.src}", rel="apple-touch-icon")
+	////Icons
+
+
+
+mixin twitterCard(params)
+	//Twitter card
+	if params.card
+		meta(property="twitter:card", content="#{params.card}")
+	if params.site
+		meta(property="twitter:site", content="#{params.site}")
+	if params.description
+		meta(property="twitter:description", content="#{params.description}")
+	if params.title
+		meta(property="twitter:title", content="#{params.title}")
+	if params.image
+		if params.image.src
+			meta(property="twitter:image:src", content="#{params.image.src}")
+		if params.image.width
+			meta(property="twitter:image:width", content="#{params.image.width}")
+		if params.image.height
+			meta(property="twitter:image:height", content="#{params.image.height}")
+	////Twitter card
+
+
+
+//- Adds CSS files
+//- params = {
+//-	@media (string) media type for file
+//-	@href (string) path to the CSS file
+//- }
+mixin addCSS(params)
+	//CSS
+	if params
+		each file in params
+			link(rel="stylesheet", type="text/css", media="#{file.media}", href="#{file.href + (file.noCache ? ('?v=' + Math.floor(Math.random() * 1000000)) : '')}")
+	////CSS
+
+
+
+//- Adds JavaScript files
+//- params = {
+//-	@src (string) path to the CSS file
+//- }
+mixin addJS(params)
+	//Scripts
+	if params
+		each file in params
+			script(type="text/javascript", src="#{file.src}")
+	////Sripts
+
+
+
+//- Adds JS global object settings
+//- params = {
+//-	@name (string) property name
+//- @value (string) property value
+//- }
+mixin addJSSettings(params)
+	if params
+		//JS settings
+		- var paramsStr = "{"
+		- each param in params
+			- paramsStr += "\n'" + param.name + "'" + ': ' + "'" + param.value + "',"
+		- paramsStr += "}"
+		script(type="text/javascript").
+			app.init.settings(#{paramsStr});
+		////JS settings
+
+
+
+//- Logo
+//- params = {
+//-	@rootClass (string) class for holder tag
+//- @href (string) home page url
+//- @home (bool) if on home page
+//- @name (string) logo name
+//- @title (string) logo link title
+//- }
+mixin logo(params)
+	- var logoImgClass = params.rootClass + "-image"
+	//Logo
+	if !params.home
+		a(href="#{params.href}", title="#{params.title}", class="#{params.rootClass}") 
+	else
+		div(class="#{params.rootClass}") 
+	////Logo
+
+
+
+//- Navigation menu 
+//- params = {
+//-	@rootClass (string) class for nav tag
+//-	@items (object) menu list items
+//- item = {
+//- 	@href (string) link
+//-		@name (string) name
+//-		@title (string) title
+//-		@class (string) custom class
+//-		@current (bool) marks menu item as current
+//-}
+//- }
+mixin menu(params)
+	if params.rootClass && params.items
+		- var innerCLass = params.rootClass + "-inner " + (params.ulClass ? params.ulClass : '')
+		- var holderClass = params.rootClass + "-item-holder " + (params.holderClass ? params.holderClass : '')
+		- var holderSubClass = holderClass + "--has-submenu"
+		- var itemClass = params.rootClass + "-item"
+		- var itemCurrentClass = itemClass + " " + itemClass + "--current"
+		- var itemTextClass = params.rootClass + "-item-name"
+		- var itemAddClass = params.rootClass + "-item-add"
+		
+		nav(itemscope, itemtype="http://schema.org/SiteNavigationElement", class="#{params.rootClass} #{params.addClass ? params.addClass : ''}")
+			ul(class="#{innerCLass}")
+				each item in params.items
+					- var customItemClass = (item.linkClass ? itemClass + " " + item.linkClass : itemClass)
+					- var customItemTextClass = (item.textClass ? itemTextClass + " " + item.textClass : itemTextClass)
+					li(class="#{holderClass} #{item.items ? holderSubClass : ''}")
+						if item.current
+							span(title="#{item.title}", class="#{customItemClass} #{itemCurrentClass}")
+								span(itemprop="name", class="#{customItemTextClass}") #{item.name}
+								if item.addHTML
+									span(class="#{itemAddClass}") #{item.addHTML}
+							if item.items
+								+menu({
+									"rootClass": params.rootClass + "-level1",
+									"items": item.items
+								})
+						else if item.href
+							a(href="#{item.href}", title="#{item.title}", itemprop="url", class="#{customItemClass} #{item.class ? item.class : ''}")
+								span(itemprop="name", class="#{customItemTextClass} #{item.textCLass ? item.textCLass : ''}") #{item.name}
+								if item.addHTML
+									span(class="#{itemAddClass}") #{item.addHTML}
+							if item.items
+								+menu({
+									"rootClass": params.rootClass + "-level1",
+									"items": item.items
+								})
+
+
+
+//- Adds simple breadcrumbs
+//- params = {
+//- @rootClass (string) html class for holder element
+//-	@items (object) breadcrumbs items
+//- item = {
+//- 	@href (string) link
+//-		@name (string) name
+//-}
+//- }
+mixin breadcrumbs(params)
+	if params.rootClass && params.items
+		- var holderClass = params.rootClass + "-item-holder"
+		- var itemClass = params.rootClass + "-item"
+		- var holderCurrentClass = holderClass + " " + holderClass + "--current"
+		- var itemTextClass = params.rootClass + "-item-name"
+
+		//Breadcrumbs
+		div(itemprop="breadcrumb", class="#{params.rootClass}")
+			each item, i in params.items
+				- var customHolderClass = item.holderClass ? holderClass + " " + item.holderClass : holderClass;
+				- var customItemTextClass = (item.textClass ? itemTextClass + " " + item.textClass : itemTextClass)
+				span(class="#{(i == params.items.length - 1) ? holderCurrentClass : customHolderClass}")
+					if i == params.items.length - 1
+						span(class="#{itemClass}", itemprop="name")
+							span(class="#{itemTextClass}") #{item.name}
+					else
+						a(href="#{item.href}", class="#{itemClass} #{item.linkClass}", itemprop="url")
+							span(class="#{customItemTextClass}", itemprop="name") #{item.name}
+		////Breadcrumbs
+
+
+
+//- Material item
+//- params = {
+//-	@rootClass (string) class for article tag
+//-	@name (string) material's name
+//- @link (string) material's detail page url
+//- @date (object) material's publish date
+//- date = {
+//-		@value (string) - string publish date
+//- 	@datetime (string) - RFC publish date
+//- }
+//- @previewText (string) material's preview text
+//- }
+mixin material(params)
+	if params.rootClass
+		- var itemClass = params.rootClass + "-item"
+		- var itemDateHolderClass = params.rootClass + "-item-date-holder"
+		- var itemDateClass = params.rootClass + "-item-date"
+		- var itemLinkHolderClass = params.rootClass + "-item-link-holder"
+		- var itemLinkClass = params.rootClass + (params.linkAddClass ? "-item-link " + params.linkAddClass : "-item-link")
+		- var itemNameHolderClass = params.rootClass + "-item-name-holder"
+		- var itemNameClass = params.rootClass + "-item-name"
+		- var itemPreviewTextClass = params.rootClass + "-item-preview"
+		- var itemPhotoHolderClass = params.rootClass + "-item-photo-holder"
+		- var itemPhotoClass = params.rootClass + "-item-photo"
+
+		article(itemscope, itemtype="http://schema.org/Article", class="#{itemClass}")
+			if params.date && params.date.value
+				div(class="#{itemDateHolderClass}")
+					time(class="#{itemDateClass}", datetime="#{params.date.datetime}", itemprop="datePublished") #{params.date.value}
+			if params.photo && params.photo.src
+				div(class="#{itemPhotoHolderClass}")
+					img(src="#{params.photo.src}", alt="#{params.photo.alt ? params.photo.alt : params.name}", width="#{params.photo.width}", height="#{params.photo.height}", class="#{itemPhotoClass}", itemprop="image")
+			if params.name && params.link
+				div(class="#{itemLinkHolderClass}")
+					a(href="#{params.link}", class="#{itemLinkClass}", itemprop="url")
+						span(itemprop="name") !{params.name}
+			else if params.name && !params.link
+				div(class="#{itemNameHolderClass}")
+					span(itemprop="name", class="#{itemNameClass}") #{params.name}
+			if params.previewText
+				div(itemprop="description", class="#{itemPreviewTextClass}") #{params.previewText}
+
+
+
+mixin materialsList(params)
+	if params.rootClass && params.items
+		section(class="#{params.rootClass}")
+			each item in params.items
+				+material({
+					"rootClass": params.rootClass,
+					"linkAddClass": params.linkAddClass,
+					"name": item.name,
+					"link": item.link,
+					"date": {
+						"value": item.date ? item.date.value : null,
+						"datetime": item.date ? item.date.datetime : null
+					},
+					"previewText": item.previewText,
+					"photo": {
+						"src": item.photo ? item.photo.src : null,
+						"width": item.photo ? item.photo.width : null,
+						"height": item.photo ? item.photo.height : null,
+						"alt": item.photo ? item.photo.alt : null
+					}
+				})
+
+
+
+//- Simple product item
+//- params = {
+//-	@rootClass (string) class for root tag
+//-	@name (string) material's name
+//- @link (string) material's detail page url
+//- @previewText (string) material's preview text
+//- }
+mixin product(params)
+	if params.rootClass
+		- var itemClass = params.rootClass + "-item"
+		- var itemLinkHolderClass = params.rootClass + "-item-link-holder"
+		- var itemLinkClass = params.rootClass + (params.linkAddClass ? "-item-link " + params.linkAddClass : "-item-link")
+		- var itemNameHolderClass = params.rootClass + "-item-name-holder"
+		- var itemNameClass = params.rootClass + "-item-name"
+		- var itemPreviewTextClass = params.rootClass + "-item-preview"
+		- var itemPhotoHolderClass = params.rootClass + "-item-photo-holder"
+		- var itemPhotoClass = params.rootClass + "-item-photo"
+
+		div(itemscope, itemtype="http://schema.org/Product", class="#{itemClass}")
+			if params.photo && params.photo.src
+				div(class="#{itemPhotoHolderClass}")
+					img(src="#{params.photo.src}", alt="#{params.photo.alt ? params.photo.alt : params.name}", width="#{params.photo.width}", height="#{params.photo.height}", class="#{itemPhotoClass}", itemprop="image")
+			if params.name && params.link
+				div(class="#{itemLinkHolderClass}")
+					a(href="#{params.link}", class="#{itemLinkClass}", itemprop="url")
+						span(itemprop="name") #{params.name}
+			else if params.name && !params.link
+				div(class="#{itemNameHolderClass}")
+					span(itemprop="name", class="#{itemNameClass}") #{params.name}
+			if params.previewText
+				div(itemprop="description", class="#{itemPreviewTextClass}") #{params.previewText}
+
+
+
+mixin catalogList(params)
+	if params.rootClass && params.items
+		section(class="#{params.rootClass}")
+			each item in params.items
+				+product({
+					"rootClass": params.rootClass,
+					"linkAddClass": params.linkAddClass,
+					"name": item.name,
+					"link": item.link,
+					"previewText": item.previewText,
+					"photo": {
+						"src": item.photo ? item.photo.src : null,
+						"width": item.photo ? item.photo.width : null,
+						"height": item.photo ? item.photo.height : null,
+						"alt": item.photo ? item.photo.alt : null
+					}
+				})
+
+
+
+mixin glossaryList(params)
+	if params.rootClass && params.items
+		- var itemClass = params.rootClass + "-item"
+		- var itemTermClass = params.rootClass + "-item-term"
+		- var itemDefinitionClass = params.rootClass + "-item-definition"
+		section(class="#{params.rootClass}")
+			each item in params.items
+				dl(class="#{itemClass}")
+					dt(title="#{item.term}", class="#{itemTermClass}") #{item.term}
+					dd(class="#{itemDefinitionClass}") #{item.definition}
+
+
+
+mixin materialsPager(params)
+	if params.rootClass && params.items
+		- var itemClass = params.rootClass + "-item"
+		- var itemCurrentClass = params.rootClass + "-item_current"
+		- var itemHolderClass = params.rootClass + "-item-holder"
+		ul(class="#{params.rootClass}")
+			each item, i in params.items
+				- var title = params.itemTitle ? params.itemTitle + "№" + i : ""
+				- var itemCustomClass = (item.class ? itemClass + " " + item.class : itemClass)
+				li(class="#{itemHolderClass}")
+					if item.current
+						span(class="#{itemCustomClass} #{itemCurrentClass}") #{item.name}
+					else if item.link
+						a(href="#{item.link}", title="#{title}", class="#{itemCustomClass}") #{item.name}
+
+
+
+mixin catalogStructureItem(params)
+	if params.rootClass
+		- var itemClass = params.rootClass + (params.linkAddClass ? "-item " + params.linkAddClass : "-item")
+		- var itemClassToggler = itemClass + "_toggler"
+		- var itemNameClass = params.rootClass + "-item-name"
+		- var itemHolderClass = params.rootClass + "-item-holder"
+
+		li(class="#{itemHolderClass}")
+			if params.items
+				div(class="#{itemClass} #{itemClassToggler}") #{params.name}
+				+catalogStructure({
+					"rootClass": params.rootClass,
+					"linkAddClass": params.linkAddClass,
+					"items": params.items
+				}, true)
+			else
+				a(href="#{params.href}", class="#{itemClass}", itemprop="url")
+					span(class="#{itemNameClass}", itemprop="name") #{params.name}
+
+
+
+mixin catalogStructure(params, inner)
+	if params.rootClass && params.items
+	- var itemInnerClass = params.rootClass + "-inner"
+		if !inner
+			nav(itemscope, itemtype="http://schema.org/SiteNavigationElement", class="#{params.rootClass}")
+				ul(class="#{itemInnerClass}")
+					each item in params.items
+						+catalogStructureItem({
+							"rootClass": params.rootClass,
+							"linkAddClass": params.linkAddClass,
+							"name": item.name,
+							"href": item.href,
+							"items": item.items
+						})
+		else 
+			ul(class="#{itemInnerClass}")
+				each item in params.items
+					+catalogStructureItem({
+						"rootClass": params.rootClass,
+						"linkAddClass": params.linkAddClass,
+						"name": item.name,
+						"href": item.href,
+						"items": item.items
+					})
+
+
+
+mixin transitionIcons(params)
+	if params.iconOut && params.iconOver
+		- var holderCustomClass = params.holderClass ? params.holderClass + " transition-icons" : "transition-icons"
+		if !params.link
+			span(class="#{holderCustomClass}")
+				span(class="transition-icon-item #{params.iconOut} transition-icon-item--out")
+				span(class="transition-icon-item #{params.iconOver} transition-icon-item--over")
+		else
+			a(href="#{params.link.href}", class="#{holderCustomClass}")
+				span(class="transition-icons-item #{params.iconOut} out")
+				span(class="transition-icons-item #{params.iconOver} over")
+
+
+
+
+mixin phone(params)
+	//Phone
+	a(href="tel:#{params.tel}", title="#{params.title}", itemprop="telephone", class="#{params.rootClass}")
+		span(class="#{params.rootClass}-inner") #{params.name}
+	////Phone
