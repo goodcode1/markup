@@ -5,6 +5,8 @@ var gulp = require("gulp"),
 	stylus = require("gulp-stylus"),
 	nib = require("nib"),
 
+	ttf2woff = require("gulp-ttf2woff"),
+
 	spritesmith = require("gulp.spritesmith"),
 	imagemin = require("gulp-imagemin"),
 	pngquant = require("imagemin-pngquant"),
@@ -139,6 +141,15 @@ gulp.task("css", function() {
 
 
 
+// Шрифты
+gulp.task("fonts", function() {
+	gulp.src(settings.paths.dev.fonts + "*.ttf")
+		.pipe(ttf2woff())
+		.pipe(gulp.dest(settings.paths.prod.fonts));
+});
+
+
+
 // Генерация спрайтов
 gulp.task("sprite", function() {
 
@@ -147,7 +158,11 @@ gulp.task("sprite", function() {
 			imgName: "sprite.png",
 			cssName:"sprite.styl",
 			cssTemplate: settings.paths.dev.cssLib + "sprite.styl.mustache",
-			padding: 20
+			padding: 20,
+			imgPath: "../i/sprite.png"
+		}))
+		.pipe(browserSync.reload({
+			stream: true
 		}));
 
 	var imgStream = spriteData.img
@@ -272,6 +287,11 @@ gulp.task("assembly", function() {
 		fs.writeFile(jsFilePath, fs.readFileSync(baseJsFilePath, "utf8").replace("XXX", settings.info.code.toUpperCase()));
 	}
 
+	// Fonts
+	if(!fs.existsSync(settings.paths.dev.fonts)) {	
+		fs.mkdirSync(settings.paths.dev.fonts);
+	}
+
 	// Images
 	if(!fs.existsSync(settings.paths.dev.images)) {	
 		fs.mkdirSync(settings.paths.dev.images);
@@ -310,6 +330,11 @@ gulp.task("default", ["browser-sync"], function() {
 	// CSS
 	watch([settings.paths.dev.css + "*.styl", settings.paths.dev.cssLib + "*.styl"], function(e) {
 		gulp.start("css");
+	});
+
+	// Шрифты
+	watch([settings.paths.dev.fonts + "*"], function(e) {
+		gulp.start("fonts");
 	});
 	
 	// HTML
