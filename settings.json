@@ -27,12 +27,13 @@
 			"js": "./dev/js/",
 			"images": "./dev/i/",
 			"icons": "./dev/i/icons/",
+			"svg": "./dev/svg/",
+			"svgIcons": "./dev/svg/icons/",
 			"css": "./dev/css/",
 			"cssLib": "./dev/lib/css/",
 			"htmlLib": "./dev/lib/html/",
 			"jsLib": "./dev/lib/js/",
-			"fonts": "./dev/fonts/",
-			"docs": "./dev/docs/"
+			"fonts": "./dev/fonts/"
 		},
 		"prod": {
 			"root": "./prod/",
@@ -40,6 +41,7 @@
 			"dummy": "./prod/dummy/",
 			"fonts": "./prod/fonts/",
 			"images": "./prod/i/",
+			"svg": "./prod/svg/",
 			"css": "./prod/css/",
 			"js": "./prod/js/",
 			"pages": "./prod/pages/"

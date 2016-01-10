@@ -60,6 +60,13 @@ html(lang="ru")
 															| #{archive.date}
 														| &nbsp;
 														small(class="text-muted") (#{archive.size} Мб.)
+
+							div
+								i(class="fa fa-book") 
+								| &nbsp;
+								a(href="docs.html", class="link")
+									b Документация
+
 			// Расчет прогресса
 			if pages
 				- var progress = 0, progressCount = 0;
@@ -68,7 +75,7 @@ html(lang="ru")
 						- progress += Number(page.progress);
 						- progressCount++;
 
-				- progress = Number(progress / progressCount);
+				- progress = Math.round(Number(progress / progressCount));
 
 				if progress < 20
 					- lineClass = "default";
