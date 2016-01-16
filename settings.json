@@ -33,13 +33,14 @@
 			"cssLib": "./dev/lib/css/",
 			"htmlLib": "./dev/lib/html/",
 			"jsLib": "./dev/lib/js/",
-			"fonts": "./dev/fonts/"
+			"fonts": "./dev/public/fonts",
+			"docs": "./dev/docs/"
 		},
 		"prod": {
 			"root": "./prod/",
 			"archives": "./prod/archives/",
 			"dummy": "./prod/dummy/",
-			"fonts": "./prod/fonts/",
+			"fonts": "./prod/fonts",
 			"images": "./prod/i/",
 			"svg": "./prod/svg/",
 			"css": "./prod/css/",

@@ -18,10 +18,11 @@ var gulp = require("gulp"),
 
 	zip = require("gulp-zip"),
 	util = require("gulp-util"),
-	ftp = require("gulp-ftp"),
+	ftp = require("vinyl-ftp"),
 
 	markdown = require("gulp-markdown"),
 
+	newer = require("gulp-newer"),
 	runSequence = require("run-sequence"),
 	merge = require("merge-stream"),
 	watch = require("gulp-watch"),
@@ -31,18 +32,27 @@ var gulp = require("gulp"),
 	request = require("request"),
 	data = require("gulp-data"),
 	jsonfile = require("jsonfile"),
+	gulpif = require("gulp-if"),
 	settings = jsonfile.readFileSync("./settings.json");
 
 
 
 // Страницы для верстки
+var checkJadeFiles = true;
+
 gulp.task("pages", function() {
 	return gulp.src(settings.paths.dev.pages + "*.jade")
+		.pipe(gulpif(checkJadeFiles, newer({
+			dest: settings.paths.prod.pages,
+			ext: ".html"
+		})), newer(settings.paths.dev.pages))
 		.pipe(data(function(file) {
-			var fileCode = path.basename(file.path).replace(".jade", "");
+			var fileCode = path.basename(file.path).replace(".jade", ""),
+				pageParams = settings.pages[fileCode];
+			pageParams.code = fileCode;
 			return {
 				info: settings.info,
-				page: settings.pages[fileCode]
+				page: pageParams
 			};
 		}))
 		.pipe(jade({
@@ -99,7 +109,7 @@ gulp.task("front", function() {
 					name: fileInfo[0],
 					size: (fileStats.size / 1024 / 1024).toFixed(2),
 					date: fileDate + " " + fileTime,
-					dateFormat: new Date(fileDate + " " + fileTime).getTime(),
+					dateFormat: new Date(fileDate.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3') + " " + fileTime).getTime(),
 					url: settings.info.productionUrl + "archives/" + fileName + ".zip"
 				});
 			}
@@ -135,6 +145,10 @@ gulp.task("front", function() {
 // Стили
 gulp.task("css", function() {
 	gulp.src(settings.paths.dev.css + "*.styl")
+		.pipe(newer({
+			dest: settings.paths.prod.css,
+			ext: ".css"
+		}))
 		.pipe(stylus({
 			use: [nib()]
 		}))
@@ -181,6 +195,7 @@ gulp.task("sprite", function() {
 // Картинки стилей
 gulp.task("images", function() {
 	gulp.src([settings.paths.dev.images + "*", settings.paths.dev.images + "**"])
+		.pipe(newer(settings.paths.prod.images))
 		.pipe(imagemin({
 			progressive: true,
 			use: [pngquant(settings.paths.prod.images)]
@@ -208,7 +223,7 @@ gulp.task("svgsprite", function() {
 			}
 		}))
 		.pipe(svgstore())
-		.pipe(gulp.dest(settings.paths.dev.svg));
+		.pipe(gulp.dest(settings.paths.prod.images));
 });
 
 
@@ -227,7 +242,11 @@ gulp.task("svg", function() {
 // JS
 gulp.task("js", function() {
 	gulp.src([settings.paths.dev.js + "*", settings.paths.dev.js + "**"])
-		.pipe(gulp.dest(settings.paths.prod.js));
+		.pipe(newer(settings.paths.prod.js))
+		.pipe(gulp.dest(settings.paths.prod.js))
+		.pipe(browserSync.reload({
+			stream: true
+		}));
 });
 
 
@@ -242,14 +261,17 @@ gulp.task("dummy", function() {
 
 // Загрузка на демо-сервер
 gulp.task("upload", function() {
-	gulp.src([settings.paths.prod.root + "*", settings.paths.prod.root + "**"])
-		.pipe(ftp({
-			host: settings.ftp.host,
-			user: settings.ftp.login,
-			pass: settings.ftp.password,
-			remotePath: "/projects/" + settings.info.code
-		}))
-		.pipe(util.noop())
+	var conn = ftp.create({
+		host: settings.ftp.host,
+		user: settings.ftp.login,
+		password: settings.ftp.password,
+		parallel: 10,
+		log: util.log
+	});
+
+	return gulp.src([settings.paths.prod.root + "*", settings.paths.prod.root + "**"], {
+			buffer: false
+		}).pipe(conn.dest("/projects/" + settings.info.code));
 });
 
 
@@ -372,7 +394,7 @@ gulp.task("assembly", function() {
 gulp.task("default", ["browser-sync"], function() {
 
 	// Картинки и иконки
-	watch([settings.paths.dev.images + "*"], function(e) {
+	watch([settings.paths.dev.images + "*", settings.paths.dev.images + "**"], function(e) {
 		gulp.start("images");
 	});
 	watch([settings.paths.dev.icons + "*"], function(e) {
@@ -403,6 +425,11 @@ gulp.task("default", ["browser-sync"], function() {
 		gulp.start("css");
 	});
 
+	// Скрипты
+	watch([settings.paths.dev.js + "*.js", settings.paths.dev.js + "**"], function(e) {
+		gulp.start("js");
+	});
+
 	// Шрифты
 	watch([settings.paths.dev.fonts + "*"], function(e) {
 		gulp.start("fonts");
@@ -414,9 +441,15 @@ gulp.task("default", ["browser-sync"], function() {
 	});
 
 	// HTML
-	watch([settings.paths.dev.pages + "*.jade", settings.paths.dev.templates + "*.jade", settings.paths.dev.htmlLib + "*.jade"], function(e) {
+	watch([settings.paths.dev.pages + "*.jade"], function(e) {
+		checkJadeFiles = true;
 		gulp.start("pages");
 	});
+	watch([settings.paths.dev.templates + "*.jade", settings.paths.dev.htmlLib + "*.jade"], function(e) {
+		checkJadeFiles = false;
+		gulp.start("pages");
+	});
+	
 
 	// Главная страница
 	watch([settings.paths.dev.root + "index.jade", "./settings.json"], function() {
@@ -465,4 +498,4 @@ gulp.task("make", function() {
 		["compress", "front"],
 		["cleanfolder", "upload"]
 	);
-});
+});	

@@ -19,9 +19,11 @@
     "gulp": "^3.9.0",
     "gulp-data": "^1.2.1",
     "gulp-ftp": "^1.1.0",
+    "gulp-if": "^2.0.0",
     "gulp-imagemin": "^2.4.0",
     "gulp-jade": "^1.1.0",
     "gulp-markdown": "^1.2.0",
+    "gulp-newer": "^1.1.0",
     "gulp-stylus": "^2.1.2",
     "gulp-svgmin": "^1.2.0",
     "gulp-svgstore": "^5.0.5",
@@ -35,6 +37,7 @@
     "nib": "^1.1.0",
     "request": "^2.67.0",
     "run-sequence": "^1.1.5",
+    "vinyl-ftp": "^0.4.5",
     "watch": "^0.17.1"
   }
 }
