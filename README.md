@@ -22,6 +22,8 @@ CSS, JS, HTML библиотеки, а также файлы по-умолчан
 
 ## Подготовка
 
+Для удобства, можно использовать следующий скрипт: https://github.com/akirikovich/markup.start
+
 - Необходимо установить последнюю стабильную версию `Node.js`: https://nodejs.org/en/download/
 - Склонировать проект `git clone https://github.com/akirikovich/markup.git <директория_проекта>`
 - Удалить данные о текущем `git`-репозитории командой `rm -rf .git*` 
