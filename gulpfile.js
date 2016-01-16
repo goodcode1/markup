@@ -45,8 +45,6 @@ var gulp = require("gulp"),
 	ttf2woff = require("gulp-ttf2woff"),
 
 	spritesmith = require("gulp.spritesmith"),
-	imagemin = require("gulp-imagemin"),
-	pngquant = require("imagemin-pngquant"),
 
 	svgstore = require("gulp-svgstore"),
 	svgmin = require("gulp-svgmin"),
@@ -241,10 +239,6 @@ gulp.task("sprite", function() {
 gulp.task("images", function() {
 	gulp.src([settings.paths.dev.images + "*", settings.paths.dev.images + "**"])
 		.pipe(newer(settings.paths.prod.images))
-		.pipe(imagemin({
-			progressive: true,
-			use: [pngquant(settings.paths.prod.images)]
-		}))
 		.pipe(gulp.dest(settings.paths.prod.images))
 		.pipe(browserSync.reload({
 			stream: true
