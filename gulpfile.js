@@ -1,3 +1,36 @@
+// Пути в проекте
+var paths = {
+	"dev": {
+		"root": "./dev/",
+		"pages": "./dev/pages/",
+		"dummy": "./dev/dummy/",
+		"templates": "./dev/templates/",
+		"lib": "./dev/lib",
+		"js": "./dev/js/",
+		"images": "./dev/i/",
+		"icons": "./dev/i/icons/",
+		"svg": "./dev/svg/",
+		"svgIcons": "./dev/svg/icons/",
+		"css": "./dev/css/",
+		"cssLib": "./dev/lib/css/",
+		"htmlLib": "./dev/lib/html/",
+		"jsLib": "./dev/lib/js/",
+		"fonts": "./dev/public/fonts",
+		"docs": "./dev/docs/"
+	},
+	"prod": {
+		"root": "./prod/",
+		"archives": "./prod/archives/",
+		"dummy": "./prod/dummy/",
+		"fonts": "./prod/fonts",
+		"images": "./prod/i/",
+		"svg": "./prod/svg/",
+		"css": "./prod/css/",
+		"js": "./prod/js/",
+		"pages": "./prod/pages/"
+	}
+};
+
 var gulp = require("gulp"),
 	
 	jade = require("gulp-jade"),
@@ -35,6 +68,8 @@ var gulp = require("gulp"),
 	gulpif = require("gulp-if"),
 	settings = jsonfile.readFileSync("./settings.json");
 
+// Слияние параметров и путей
+settings.paths = paths;
 
 
 // Страницы для верстки
