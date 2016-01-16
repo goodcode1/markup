@@ -15,7 +15,7 @@ var paths = {
 		"cssLib": "./dev/lib/css/",
 		"htmlLib": "./dev/lib/html/",
 		"jsLib": "./dev/lib/js/",
-		"fonts": "./dev/public/fonts",
+		"fonts": "./dev/fonts/",
 		"docs": "./dev/docs/"
 	},
 	"prod": {
@@ -34,9 +34,13 @@ var paths = {
 var gulp = require("gulp"),
 	
 	jade = require("gulp-jade"),
+	htmlmin = require("gulp-htmlmin")
 
 	stylus = require("gulp-stylus"),
 	nib = require("nib"),
+	minifyCss = require("gulp-minify-css"),
+
+	uglify = require("gulp-uglify"),
 
 	ttf2woff = require("gulp-ttf2woff"),
 
@@ -166,7 +170,13 @@ gulp.task("front", function() {
 					pages: settings.pages,
 					archives: archives
 				},
-				pretty: true
+				pretty: false
+			}))
+			.pipe(htmlmin({
+				collapseWhitespace: true,
+				removeComments: true,
+				minifyJS: true,
+				minifyCSS: true
 			}))
 			.pipe(gulp.dest(settings.paths.prod.root))
 			.pipe(browserSync.reload({
@@ -489,6 +499,7 @@ gulp.task("default", ["browser-sync"], function() {
 	// Главная страница
 	watch([settings.paths.dev.root + "index.jade", "./settings.json"], function() {
 		settings = jsonfile.readFileSync("./settings.json");
+		settings.paths = paths;
 		runSequence(
 			["front", "pages"]
 		);

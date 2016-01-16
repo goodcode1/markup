@@ -19,24 +19,35 @@ html(lang="ru")
 			href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css",
 			rel="stylesheet"
 		)
+		link(href="http://html-atlantis.ru/favicon.ico", rel="shortcut icon", type="image/x-icon")
+		style(type="text/css").
+			body {
+				cursor: default;
+			}
+			h1 {
+				margin: 0;
+			}
+			.footer-copyright {
+				margin-left: -1em;
+			}
 	body
-		div.container
+		div(class="container")
 			header
 				br
 				div(class="jumbotron")
 					div(class="row")
-						div(class="col-md-8")
+						div(class="col-md-7")
 							div(class="text-muted")
 								small HTML-верстка проекта
 							
 							if info.name
-								h1(style="margin: 0;") #{info.name}
+								h1 #{info.name}
 
 							if info.notes
-								p(class="lead text-muted", style="line-height: 1")
+								p(class="lead text-muted")
 									small #{info.notes}
 
-						div(class="col-md-4")
+						div(class="col-md-4 col-md-offset-1")
 							if(archives && archives.length)
 								div(class="panel panel-default")
 									div(class="panel-heading") 
@@ -49,7 +60,7 @@ html(lang="ru")
 														b
 															i(class="fa fa-download")
 															| &nbsp;
-															a(href="#{archive.url}", class="link", title="Скачать")
+															a(href="#{archive.url}", class="link", title="Скачать", data-toggle="tooltip", data-placement="top")
 																| #{archive.date}
 															| &nbsp;
 															small(class="text-muted") (#{archive.size} Мб.)
@@ -65,7 +76,7 @@ html(lang="ru")
 								i(class="fa fa-book") 
 								| &nbsp;
 								a(href="docs.html", class="link")
-									b Документация
+									b Документация по проекту
 
 			// Расчет прогресса
 			if pages
@@ -139,61 +150,117 @@ html(lang="ru")
 									- labelTitle = "Страница готова";
 								span.label(class="#{labelClass}", data-toggle="tooltip", data-placement="top", title="#{labelTitle}") #{page.progress}
 			hr
-			footer
-				div(class="row")
-					div(class="col-md4 pull-left")
-						p(class="text-muted")
-							span(style="margin-left: -1em;") &copy; 
-							b HTML Atlantis
-							small , г. Ростов-на-Дону
-							if info.year
-								small , #{info.year} г.
-							br
-							span
-								i(class="fa fa-hand-pointer-o") &nbsp;
-								a(href="http://html-atlantis.ru", target="_blank", title="Перейти на наш сайт", data-toggle="tooltip", data-placement="top") html-atlantis.ru							
-							br
-							span
-								i(class="fa fa-envelope") &nbsp;
-								a(href="mailto:info@html-atlantis.ru", title="Написать нам на почту", data-toggle="tooltip", data-placement="top") info@html-atlantis.ru
+			footer(class="page-footer")
+				div(class="col-md4 pull-left")
+					p(class="text-muted")
+						span(class="footer-copyright") &copy; 
+						b HTML Atlantis
+						small , г. Ростов-на-Дону
+						if info.year
+							small , #{info.year} г.
+						br
+						span
+							i(class="fa fa-hand-pointer-o") &nbsp;
+							a(href="http://html-atlantis.ru", target="_blank", title="Перейти на наш сайт", data-toggle="tooltip", data-placement="top") html-atlantis.ru							
+						br
+						span
+							i(class="fa fa-envelope") &nbsp;
+							a(href="mailto:info@html-atlantis.ru", title="Написать нам на почту", data-toggle="tooltip", data-placement="top") info@html-atlantis.ru
 
-					div(class="col-md4 pull-right")
-						button(class="btn btn-primary", data-toggle="modal", data-target="#order-form") Заказать верстку
-						form(class="modal fade", id="order-form", tabindex="-1", role="dialog", aria-labelledby="myLargeModalLabel")
-							div(class="modal-dialog modal-lg")
-								div(class="modal-content")
-									div(class="modal-header")
-										button(type="button", class="close", data-dismiss="modal", aria-label="Close")
-											span(aria-hidden="true") &times;
-										h3(class="modal-title") Заказать HTML5-верстку
-									div(class="modal-body")
-										p Пожалуйста, заполните следующие поля и спустя короткое время мы с Вами свяжемся.
-										div(class="form-group")
-											label(for="order-name")
-												strong Ваше имя
-											input(type="text", class="form-control", id="order-name")
-										div(class="form-group")
-											label(for="order-email")
-												strong Ваша эл. почта
-											input(type="email", class="form-control", id="order-email")
-										div(class="form-group")
-											label(for="order-url")
-												strong Ссылка на макеты
-											input(type="text", class="form-control", id="order-url")
-										div(class="form-group")
-											label(for="order-comments")
-												strong Комментарии
-											textarea(class="form-control", rows="3", id="order-comments")
-									div(class="modal-footer")
-										button(type="submit", class="btn btn-primary") Отправить
-			
-			script(src="https://code.jquery.com/jquery-1.11.3.min.js")
-			script(
-				src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", 
-				integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS",
-				crossorigin="anonymous"
-			)
-			script.
-				(function($) {
-					$("[data-toggle=\"tooltip\"]").tooltip();
-				})(jQuery);
+				div(class="col-md4 pull-right")
+					button(class="btn btn-primary", data-toggle="modal", data-target="#order-form") Заказать верстку
+
+		form(class="modal fade", id="order-form", tabindex="-1", role="dialog", aria-labelledby="myLargeModalLabel")
+			input(type="hidden", class="form-control", data-title="Проект", value="#{info.name}")
+			div(class="modal-dialog modal-lg")
+				div(class="modal-content")
+					div(class="modal-header")
+						button(type="button", class="close", data-dismiss="modal", aria-label="Close")
+							span(aria-hidden="true") &times;
+						h3(class="modal-title") Заказать HTML5-верстку
+					div(class="modal-body")
+						p Пожалуйста, заполните следующие поля и спустя короткое время мы с Вами свяжемся.
+						div(class="form-group")
+							label(for="order-name")
+								strong Ваше имя
+							input(type="text", class="form-control", required, data-title="Имя", id="order-name")
+						div(class="form-group")
+							label(for="order-email")
+								strong Ваша эл. почта
+							input(type="email", class="form-control", required, data-title="Эл. почта", id="order-email")
+						div(class="form-group")
+							label(for="order-url")
+								strong Ссылка на макеты
+							input(type="text", class="form-control", id="order-url", data-title="Макеты")
+						div(class="form-group")
+							label(for="order-comments")
+								strong Комментарий
+							textarea(class="form-control", rows="3", id="order-comments", data-title="Комментрий")
+					div(class="modal-footer")
+						button(type="submit", class="btn btn-primary") Отправить
+		
+		form(class="modal fade", id="result-form", tabindex="-1", role="dialog", aria-labelledby="myLargeModalLabel")
+			div(class="modal-dialog modal-lg")
+				div(class="modal-content")
+					div(class="modal-header")
+						button(type="button", class="close", data-dismiss="modal", aria-label="Close")
+							span(aria-hidden="true") &times;
+						h3(class="modal-title") Спасибо за заказ
+					div(class="modal-body")
+						p Спасибо, в ближайшее время мы с Вами свяжемся.
+					div(class="modal-footer")
+						button(type="submit", class="btn btn-primary") Закрыть
+
+		<!-- Yandex.Metrika counter --><script type="text/javascript"> (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter34728135 = new Ya.Metrika({ id:34728135, clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks");</script><noscript><div><img src="https://mc.yandex.ru/watch/34728135" style="position:absolute; left:-9999px;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->
+
+		script(src="https://code.jquery.com/jquery-1.11.3.min.js")
+		script(
+			src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", 
+			integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS",
+			crossorigin="anonymous"
+		)
+		script.
+			(function($) {
+				$("[data-toggle=\"tooltip\"]").tooltip();
+
+				// Отправка формы заявки
+				$("#order-form").on("submit", function(e) {
+					var mailStr = '',
+						$fields = $(".form-control", $(this));
+
+					$fields.each(function() {
+						var $field = $(this);
+						mailStr += '<p>';
+						mailStr += '<b>' + $field.data("title") + ':</b> ';
+						mailStr += $field.val();
+						mailStr += '</p>';
+					});
+
+					$.ajax({
+						"url": "https://mandrillapp.com/api/1.0/messages/send.json",
+						"data": {
+							"key": "o-vBz0nR5C3b13fJF51IhA",
+							"message": {
+								"from_email": "info@html-atlantis.ru",
+								"headers": {
+									"Reply-to": $("#order-email").val()
+								},
+								"to": [
+									{
+										"email": "info@html-atlantis.ru",
+										"name": "Кирикович Александр",
+										"type": "to"
+									}
+								],
+								"autotext": true,
+								"subject": "Заказ верстки со страницы проекта",
+								"html": mailStr
+							}
+						}
+					}).done(function(response) {
+						$("#order-form").modal("toggle");
+						$("#result-form").modal();
+					});
+					e.preventDefault();
+				});
+			})(jQuery);
