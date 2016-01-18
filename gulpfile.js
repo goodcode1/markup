@@ -38,9 +38,8 @@ var gulp = require("gulp"),
 
 	stylus = require("gulp-stylus"),
 	nib = require("nib"),
-	minifyCss = require("gulp-minify-css"),
+	
 
-	uglify = require("gulp-uglify"),
 
 	ttf2woff = require("gulp-ttf2woff"),
 
@@ -57,17 +56,22 @@ var gulp = require("gulp"),
 
 	markdown = require("gulp-markdown"),
 
+	concat = require("gulp-concat"),
+	uglify = require("gulp-uglify"),
+	minifyCss = require("gulp-minify-css"),
+
+
 	newer = require("gulp-newer"),
 	runSequence = require("run-sequence"),
 	merge = require("merge-stream"),
 	watch = require("gulp-watch"),
-	file = require("file"),
 	fs = require("fs"),
 	path = require("path"),
 	request = require("request"),
 	data = require("gulp-data"),
 	jsonfile = require("jsonfile"),
 	gulpif = require("gulp-if"),
+	argv = require("yargs").argv,
 	settings = jsonfile.readFileSync("./settings.json");
 
 // Слияние параметров и путей
@@ -105,7 +109,27 @@ gulp.task("pages", function() {
 
 // Создание архива верстки
 gulp.task("compress", function() {
-	
+
+	// Рекурсивное удаление файлов
+	var deleteFolderRecursive = function(path) {
+		if(fs.existsSync(path)) {
+			fs.readdirSync(path).forEach(function(file,index) {
+				var curPath = path + "/" + file;
+				if(fs.lstatSync(curPath).isDirectory()) { // recurse
+					deleteFolderRecursive(curPath);
+				} else { // delete file
+					fs.unlinkSync(curPath);
+				}
+			});
+			fs.rmdirSync(path);
+		}
+	};
+
+	// Удаление существующих архивов
+	if(argv.clear) {
+		deleteFolderRecursive(settings.paths.prod.archives);
+	}
+
 	var archiveName = ''
 		date = new Date();
 
@@ -128,59 +152,57 @@ gulp.task("front", function() {
 	// Получение списка архивов
 	var archives = [],
 		archive;
-	file.walk(settings.paths.prod.archives, function(n, dirName, dirPaths, files) {
-		if(files) {
-			// Получение файлов архивов из директории
-			for(var i = 0, len = files.length; i < len; i++) {
+	fs.readdirSync(settings.paths.prod.archives).forEach(function(file, index) {
 
-				var filePath = files[i].split("\\"),
-					fileName = filePath[filePath.length - 1].replace(".zip", ""),
-					fileInfo = fileName.split("_"),
-					fileDate = fileInfo[1].replace(/-/g, "."),
-					fileTime = fileInfo[2].replace(/-/g, ":");
+		var fileName = file.replace(".zip", ""),
+			fileInfo = fileName.split("_"),
+			fileDate = fileInfo[1].replace(/-/g, "."),
+			fileTime = fileInfo[2].replace(/-/g, ":");
 
-				// Информация о файле
-				var fileStats = fs.statSync(files[i]);
+		// Информация о файле
+		var fileStats = fs.statSync(settings.paths.prod.archives + file);
+		//console.log(fileStats);
 
-				archives.push({
-					name: fileInfo[0],
-					size: (fileStats.size / 1024 / 1024).toFixed(2),
-					date: fileDate + " " + fileTime,
-					dateFormat: new Date(fileDate.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3') + " " + fileTime).getTime(),
-					url: settings.info.productionUrl + "archives/" + fileName + ".zip"
-				});
-			}
+		archives.push({
+			name: fileInfo[0],
+			size: (fileStats.size / 1024 / 1024).toFixed(2),
+			date: fileDate + " " + fileTime,
+			dateFormat: new Date(fileDate.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3') + " " + fileTime).getTime(),
+			url: settings.info.productionUrl + "archives/" + fileName + ".zip"
+		});
 
-			// Сортировка по убыванию времени создания
-			archives.sort(function(a, b) {
-				if(a.dateFormat == b.dateFormat) {
-					return 0;
-				}
-				return (a.dateFormat < b.dateFormat) ? 1 : -1;
-			});
-		}
-
-		// Формирование html страницы
-		gulp.src(settings.paths.dev.root + "index.jade")
-			.pipe(jade({
-				locals: {
-					info: settings.info,
-					pages: settings.pages,
-					archives: archives
-				},
-				pretty: false
-			}))
-			.pipe(htmlmin({
-				collapseWhitespace: true,
-				removeComments: true,
-				minifyJS: true,
-				minifyCSS: true
-			}))
-			.pipe(gulp.dest(settings.paths.prod.root))
-			.pipe(browserSync.reload({
-				stream: true
-			}));
 	});
+
+	// Сортировка по убыванию времени создания
+	archives.sort(function(a, b) {
+		if(a.dateFormat == b.dateFormat) {
+			return 0;
+		}
+		return (a.dateFormat < b.dateFormat) ? 1 : -1;
+	});
+
+	//console.log(archives); return false;
+
+	// Формирование html страницы
+	gulp.src(settings.paths.dev.root + "index.jade")
+		.pipe(jade({
+			locals: {
+				info: settings.info,
+				pages: settings.pages,
+				archives: archives
+			},
+			pretty: false
+		}))
+		.pipe(htmlmin({
+			collapseWhitespace: true,
+			removeComments: true,
+			minifyJS: true,
+			minifyCSS: true
+		}))
+		.pipe(gulp.dest(settings.paths.prod.root))
+		.pipe(browserSync.reload({
+			stream: true
+		}));
 });
 
 
@@ -194,6 +216,17 @@ gulp.task("css", function() {
 		}))
 		.pipe(stylus({
 			use: [nib()]
+		}))
+		.pipe(gulp.dest(settings.paths.prod.css))
+		.pipe(browserSync.reload({
+			stream: true
+		}));
+
+	// Для обычных css файлов
+	gulp.src(settings.paths.dev.css + "*.css")
+		.pipe(newer({
+			dest: settings.paths.prod.css,
+			ext: ".css"
 		}))
 		.pipe(gulp.dest(settings.paths.prod.css))
 		.pipe(browserSync.reload({
@@ -430,6 +463,25 @@ gulp.task("assembly", function() {
 
 
 
+// Создание минифицированных js и css файлов
+gulp.task("prodmin", function() {
+
+	// Конкатенация и минификация JS
+	gulp.src([settings.paths.prod.js + "*.js", settings.paths.prod.js + "**"])
+		.pipe(concat(settings.info.code + ".min.js"))
+		.pipe(uglify())
+		.pipe(gulp.dest(settings.paths.prod.js));
+
+	// Конкатенация и минификация CSS
+	gulp.src([settings.paths.prod.css + "*.css", settings.paths.prod.css + "**"])
+		.pipe(concat(settings.info.code + ".min.css"))
+		.pipe(minifyCss())
+		.pipe(gulp.dest(settings.paths.prod.css));
+
+});
+
+
+
 gulp.task("default", ["browser-sync"], function() {
 
 	// Картинки и иконки
@@ -460,7 +512,7 @@ gulp.task("default", ["browser-sync"], function() {
 	});
 
 	// CSS
-	watch([settings.paths.dev.css + "*.styl", settings.paths.dev.cssLib + "*.styl"], function(e) {
+	watch([settings.paths.dev.css + "*", settings.paths.dev.cssLib + "*.styl"], function(e) {
 		gulp.start("css");
 	});
 
