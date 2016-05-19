@@ -152,26 +152,28 @@ gulp.task("front", function() {
 	// Получение списка архивов
 	var archives = [],
 		archive;
-	fs.readdirSync(settings.paths.prod.archives).forEach(function(file, index) {
-
-		var fileName = file.replace(".zip", ""),
-			fileInfo = fileName.split("_"),
-			fileDate = fileInfo[1].replace(/-/g, "."),
-			fileTime = fileInfo[2].replace(/-/g, ":");
-
-		// Информация о файле
-		var fileStats = fs.statSync(settings.paths.prod.archives + file);
-		//console.log(fileStats);
-
-		archives.push({
-			name: fileInfo[0],
-			size: (fileStats.size / 1024 / 1024).toFixed(2),
-			date: fileDate + " " + fileTime,
-			dateFormat: new Date(fileDate.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3') + " " + fileTime).getTime(),
-			url: settings.info.productionUrl + "archives/" + fileName + ".zip"
-		});
-
-	});
+	if(fs.existsSync(settings.paths.prod.archives)) {
+		fs.readdirSync(settings.paths.prod.archives).forEach(function(file, index) {
+	
+			var fileName = file.replace(".zip", ""),
+				fileInfo = fileName.split("_"),
+				fileDate = fileInfo[1].replace(/-/g, "."),
+				fileTime = fileInfo[2].replace(/-/g, ":");
+	
+			// Информация о файле
+			var fileStats = fs.statSync(settings.paths.prod.archives + file);
+			//console.log(fileStats);
+	
+			archives.push({
+				name: fileInfo[0],
+				size: (fileStats.size / 1024 / 1024).toFixed(2),
+				date: fileDate + " " + fileTime,
+				dateFormat: new Date(fileDate.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3') + " " + fileTime).getTime(),
+				url: settings.info.productionUrl + "archives/" + fileName + ".zip"
+			});
+	
+		});	
+	}
 
 	// Сортировка по убыванию времени создания
 	archives.sort(function(a, b) {
