@@ -22,7 +22,7 @@ CSS, JS, HTML библиотеки, а также файлы по-умолчан
 
 ## Подготовка
 
-Для удобства, можно использовать следующий скрипт: https://github.com/akirikovich/markup.start
+Для удобства, можно использовать следующий скрипт: https://github.com/goodcode1/markup.start
 
 - Необходимо установить последнюю стабильную версию `Node.js`: https://nodejs.org/en/download/
 - Склонировать проект `git clone https://github.com/akirikovich/markup.git <директория_проекта>`
